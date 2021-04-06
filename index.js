@@ -11,7 +11,14 @@ const client = new Discord.Client()
 client.login(process.env.BOT_TOKEN).catch(console.error)
 const prefix = '!'
 
-const sequelize = new Sequelize(process.env.DATABASE_URL);
+const sequelize = new Sequelize(process.env.DATABASE_URL, 
+{
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+        ssl: true
+    }
+});
 
 const Runs = sequelize.define('runs', {
 	discord_name: {
