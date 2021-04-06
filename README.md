@@ -1,5 +1,5 @@
 # speedrun-bot
-Simple bot to record speedruns for a game. I wrote it in a rush, hence horrible looking unrefactored code.
+Simple discord bot to record speedruns for a game. I wrote it in a rush, hence horrible looking unrefactored code.
 
     !speedrun add [time]
 
