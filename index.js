@@ -11,13 +11,7 @@ const client = new Discord.Client()
 client.login(process.env.BOT_TOKEN).catch(console.error)
 const prefix = '!'
 
-const sequelize = new Sequelize('database', 'user', 'password', {
-	host: 'localhost',
-	dialect: 'sqlite',
-	logging: false,
-	// SQLite only
-	storage: 'database.sqlite',
-});
+const sequelize = new Sequelize(process.env.DATABASE_URL);
 
 const Runs = sequelize.define('runs', {
 	discord_name: {
