@@ -96,7 +96,7 @@ client.on('message', async message => {
                         run_time: seconds
                     });
         
-                    return message.reply(`Run of ${args} added for {message.author.username}`);
+                    return message.reply(`Run of ${args} added for ${message.author.username}`);
                 }
                 catch (e) {
                     if (e.name === 'SequelizeUniqueConstraintError') {
