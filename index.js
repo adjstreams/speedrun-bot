@@ -60,10 +60,10 @@ client.on('message', async message => {
             var runString = '';
             var i = 1;
             runList.forEach(element => {
-                runString += `${i}\t\t${element.get('discord_name')}\t\t\t${convertToHHMMSS(element.get('run_time'))}\n`
+                runString += `${i}\t\t${element.get('discord_name')}\t\t\t\t${convertToHHMMSS(element.get('run_time'))}\n`
             }) 
 
-            return message.channel.send(`\nSpeed Run Leaderboard:\n\n ${runString}`);
+            return message.channel.send(`\nSpeed Run Leaderboard:\n\n${runString}`);
         }
 
         const subcommand = args.shift().toLowerCase();
