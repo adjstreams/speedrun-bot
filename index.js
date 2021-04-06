@@ -54,17 +54,7 @@ client.on('message', async message => {
 
     if (command === 'speedrun') {
         if (args.length === 0) {
-            const runList = await Runs.findAll({ attributes: ['discord_name', 'run_time'], order: [
-                ['run_time', 'ASC']
-            ] });
-            var runString = '';
-            var i = 1;
-            runList.forEach(element => {
-                runString += `${i}\t\t${element.get('discord_name')}\t\t\t\t\t${convertToHHMMSS(element.get('run_time'))}\n`
-                i++;
-            }) 
-
-            return message.channel.send(`\nSpeed Run Leaderboard:\n\n${runString}`);
+            return await getTable(message);
         }
 
         const subcommand = args.shift().toLowerCase();
@@ -89,7 +79,8 @@ client.on('message', async message => {
                     // update the run
                     const affectedRows = await Runs.update({ run_time: seconds }, { where: { discord_name: message.author.username } });
                     if (affectedRows > 0) {
-                        return message.reply(`Run of ${args} updated for ${message.author.username}. Congratulations on beating your old PB of ${hms}!`);
+                        message.reply(`Run of ${args} updated for ${message.author.username}. Congratulations on beating your old PB of ${hms}!`);
+                        await getTable(message);
                     } else {
                         return message.reply('Well, it should have updated your existing PB there but something went wrong...');
                     }
@@ -101,7 +92,8 @@ client.on('message', async message => {
                         run_time: seconds
                     });
         
-                    return message.reply(`Run of ${args} added for ${message.author.username}`);
+                    message.reply(`Run of ${args} added for ${message.author.username}`);
+                    await getTable(message);
                 }
                 catch (e) {
                     if (e.name === 'SequelizeUniqueConstraintError') {
@@ -132,4 +124,25 @@ function calculateSeconds(hms) {
 
 function convertToHHMMSS(seconds) {
     return new Date(seconds * 1000).toISOString().substr(11, 8);
+}
+
+function paddedName(name) {
+ //   return name.padEnd(33, '.');
+ return `${name} - `
+}
+
+async function getTable(message)
+{
+    const runList = await Runs.findAll({ attributes: ['discord_name', 'run_time'], order: [
+        ['run_time', 'ASC']
+    ] });
+    var runString = '';
+    var i = 1;
+    runList.forEach(element => {
+        runString += `${i}\t\t${paddedName(element.get('discord_name'))}${convertToHHMMSS(element.get('run_time'))}\n`
+        i++;
+    }) 
+
+    return message.channel.send(`\nSpeed Run Leaderboard:\n\n${runString}`);
+
 }
