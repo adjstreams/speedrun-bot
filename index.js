@@ -82,7 +82,7 @@ client.on('message', async message => {
                     return message.reply(`This time was not faster than your existing PB of ${hms}`);
                 } else {
                     // update the run
-                    const affectedRows = await Runs.update({ run_time: current_seconds }, { where: { discord_name: message.author.username } });
+                    const affectedRows = await Runs.update({ run_time: seconds }, { where: { discord_name: message.author.username } });
                     if (affectedRows > 0) {
                         return message.reply(`Run of ${args} updated for ${message.author.username}. Congratulations on beating your old PB of ${hms}!`);
                     } else {
