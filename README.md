@@ -1,4 +1,5 @@
 # speedrun-bot
+
 Simple discord bot to record speedruns for a game. I wrote it in a rush, hence horrible looking unrefactored code.
 
     !speedrun add [time]
@@ -10,7 +11,7 @@ and to retrieve current top runs:
 ## Future plans?
 
 I only did this as a quick project, but immediately started to think about
-what else this would need if it was to be useful to others.  (Don't worry, if I do, I'll fix up the code to make it nicely structured and clean)
+what else this would need if it was to be useful to others. (Don't worry, if I do, I'll fix up the code to make it nicely structured and clean)
 
 - Ability to add different games.
 - Ability to add different speed run categories to games.
