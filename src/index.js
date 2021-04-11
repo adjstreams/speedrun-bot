@@ -3,11 +3,10 @@ import { Client } from "discord.js";
 import { ping } from "./ping.js";
 import {
   calculateSeconds,
-  convertToHHMMSS,
   isValidTimeFormat,
 } from "./time-util.js";
 import Sequelize from "sequelize";
-
+import { getTable, updateRun, addRun } from "./speedrun.js";
 import { runModel } from "./runs.model.js";
 
 dotenv.config();
@@ -47,6 +46,14 @@ client.once("ready", () => {
 });
 
 client.on("message", async (message) => {
+
+  // Needs further refactoring
+  // i.e. 
+  // middleware to handle validation of input
+  // separating out database interaction from discord message responses
+  // pass an object into methods rather than strings
+  // Also, consider converting to typescript
+
   if (message.author.bot) {
     return;
   }
@@ -64,7 +71,7 @@ client.on("message", async (message) => {
 
   if (command === "speedrun") {
     if (args.length === 0) {
-      return await getTable(message);
+      return await getTable(message, Runs);
     }
 
     const subcommand = args.shift().toLowerCase();
@@ -90,72 +97,10 @@ client.on("message", async (message) => {
         where: { discord_name: message.author.username },
       });
       if (run) {
-        var current_seconds = run.get("run_time");
-        var hms = convertToHHMMSS(current_seconds);
-
-        if (seconds >= current_seconds) {
-          return message.reply(
-            `This time was not faster than your existing PB of ${hms}`
-          );
-        } else {
-          // update the run
-          const affectedRows = await Runs.update(
-            { run_time: seconds },
-            { where: { discord_name: message.author.username } }
-          );
-          if (affectedRows > 0) {
-            message.reply(
-              `Run of ${theSubmittedTime} updated for ${message.author.username}. Congratulations on beating your old PB of ${hms}!`
-            );
-            await getTable(message);
-          } else {
-            return message.reply(
-              "Well, it should have updated your existing PB there but something went wrong..."
-            );
-          }
-        }
+        updateRun(Runs, run, theSubmittedTime, seconds, message);
       } else {
-        try {
-          await Runs.create({
-            discord_name: message.author.username,
-            run_time: seconds,
-          });
-
-          message.reply(
-            `Run of ${theSubmittedTime} added for ${message.author.username}`
-          );
-          await getTable(message);
-        } catch (e) {
-          if (e.name === "SequelizeUniqueConstraintError") {
-            return message.reply(
-              "That run already exists, but for some reason it didn't update?!"
-            );
-          }
-          return message.reply("Something went wrong with adding a run.");
-        }
+        addRun(Runs, seconds, message, theSubmittedTime); 
       }
     }
   }
 });
-
-function paddedName(name) {
-  //   return name.padEnd(33, '.');
-  return `${name} - `;
-}
-
-async function getTable(message) {
-  const runList = await Runs.findAll({
-    attributes: ["discord_name", "run_time"],
-    order: [["run_time", "ASC"]],
-  });
-  var runString = "";
-  var i = 1;
-  runList.forEach((element) => {
-    runString += `${i}\t\t${paddedName(
-      element.get("discord_name")
-    )}${convertToHHMMSS(element.get("run_time"))}\n`;
-    i++;
-  });
-
-  return message.channel.send(`\nSpeed Run Leaderboard:\n\n${runString}`);
-}
